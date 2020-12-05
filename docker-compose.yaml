@@ -1,0 +1,45 @@
+version: '3'
+services:
+
+  mysql:
+    image: mysql:5.7
+    # container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: database
+      MYSQL_USER: docker
+      MYSQL_PASSWORD: password
+    networks:
+      app_net:
+        ipv4_address: 172.30.0.10
+    ports:
+      - "3306:3306"
+    # volumes:
+    #   - ./docker/mysql/data:/var/lib/mysql
+    #   - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+      
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    # container_name: phpmyadmin
+    depends_on:
+      - mysql
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOSTS=mysql
+      - PMA_USER=docker
+      - PMA_PASSWORD=password
+    networks:
+      app_net:
+        ipv4_address: 172.30.0.20
+    ports:
+      - "8080:80"
+    # volumes:
+    #   - ./docker/phpmyadmin:/sessions
+
+networks:
+  app_net:
+    driver: bridge
+    ipam:
+     driver: default
+     config:
+       - subnet: 172.30.0.0/24
